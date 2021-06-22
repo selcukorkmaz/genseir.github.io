@@ -1,0 +1,6 @@
+name: "genSEIR Tutorial"
+navbar:
+  title: "genSEIR"
+  left:
+    - text: "Tutorial"
+      href: index.html
