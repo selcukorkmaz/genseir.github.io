@@ -30,7 +30,7 @@ Define the country and its population:
 
 ```{r country}
 country = "Italy"
-Npop = 66000000 
+Npop = 60000000 
 ```
 
 Enter desired start and finish dates in *mm/dd/yy* format. Start date cannot be earlier than 01/22/21 and finish date cannot be later than the current date - 1. If `start=NULL` then start date is set to 01/22/21 and If `finish=NULL` then finish date is set to `Sys.Date()-1`:
