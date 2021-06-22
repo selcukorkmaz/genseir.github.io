@@ -1,8 +1,13 @@
 ---
-title: "Predict Epidemic Curves with Generalized SEIR Modeling"
+title: "Predict Epidemic Curves for COVID-19 with Generalized SEIR Modeling"
 author: "Selcuk Korkmaz"
-date: "22 06 2021"
-output: html_document
+date: "22/06/2021"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+    includes:
+      in_header: header.html
 ---
 
 ```{r setup, include=FALSE}
@@ -25,14 +30,14 @@ Define the country and its population:
 
 ```{r country}
 country = "Italy"
-Npop = 60000000 
+Npop = 66000000 
 ```
 
 Enter desired start and finish dates in *mm/dd/yy* format. Start date cannot be earlier than 01/22/21 and finish date cannot be later than the current date - 1. If `start=NULL` then start date is set to 01/22/21 and If `finish=NULL` then finish date is set to `Sys.Date()-1`:
 
 ```{r date}
 start = "01/01/21" 
-finish = "06/20/21"
+finish = "06/01/21"
 ```
 
 Define `dt` argument which oversamples time to ensure that the algorithm converges (i.e. 1/24), and specify `f` argument for the future predictions (i.e. 30 days):  
@@ -80,9 +85,9 @@ Remove first four columns since they do not include number of cases:
 Define initial estimates for parameters to be optimized: `alpha_guess`: protection rate, `beta_guess`: infection rate, `LT_guess`: latent time in days, `Q_guess`: rate at which infectious people enter in quarantine, `lambda_guess`: time dependent recovery rate, `kappa_guess`: time dependent death rate. These are the parameters that define the course of the outbreak and they will be optimized in the later steps:
 
 ```{r params}
-alpha_guess = 0.2 
+alpha_guess = 0.2
 beta_guess = 1
-LT_guess = 2
+LT_guess = 3
 Q_guess = 0.3
 lambda_guess = c(0.01,0.001,10)
 kappa_guess = c(0.001,0.001,10)
@@ -152,15 +157,61 @@ result = SEIQRDP(alpha = params$alpha1, beta = params$beta1,
   
 ```
 
-Predicted results:
+Predictions for susceptible cases:
 
-```{r results}
+```{r susceptible}
 
-result
+head(result$susceptible)
 
 ```
 
+Predictions for exposed cases:
 
+```{r exposed}
+
+head(result$exposed)
+
+```
+
+Predictions for infectious cases:
+
+```{r infectious}
+
+head(result$infectious)
+
+```
+
+Predictions for quarantined cases:
+
+```{r quarantined}
+
+head(result$quarantined)
+
+```
+
+Predictions for recovered cases:
+
+```{r recovered}
+
+head(result$recovered)
+
+```
+
+Predictions for dead cases:
+
+```{r dead}
+
+head(result$dead)
+
+```
+
+Predictions for insusceptible cases:
+
+```{r insusceptible}
+
+head(result$insusceptible)
+
+```
 
 Create plot for reported and predicted active, recovered and death cases. This function also plots the fitted and calculated death and recovered ratios to check whether the approximation of these ratios is appropriate:
 

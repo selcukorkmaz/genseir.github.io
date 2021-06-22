@@ -8,255 +8,115 @@
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Selcuk Korkmaz" />
 
 
-<title>Predict Epidemic Curves with Generalized SEIR Modeling</title>
+<title>Predict Epidemic Curves for COVID-19 with Generalized SEIR Modeling</title>
 
 <script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
-<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
-<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
-<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
-<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
-<script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<a href="https://github.com/selcukorkmaz/genSEIR" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#000000; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
 
-<style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
-  pre:not([class]) {
-    background-color: white;
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
   }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+/* A workaround for https://github.com/jgm/pandoc/issues/4278 */
+a.sourceLine {
+  pointer-events: auto;
+}
+
 </style>
-<script type="text/javascript">
-if (window.hljs) {
-  hljs.configure({languages: []});
-  hljs.initHighlightingOnLoad();
-  if (document.readyState && document.readyState === "complete") {
-    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
-  }
-}
-</script>
-
-
-
-<style type="text/css">
-h1 {
-  font-size: 34px;
-}
-h1.title {
-  font-size: 38px;
-}
-h2 {
-  font-size: 30px;
-}
-h3 {
-  font-size: 24px;
-}
-h4 {
-  font-size: 18px;
-}
-h5 {
-  font-size: 16px;
-}
-h6 {
-  font-size: 12px;
-}
-.table th:not([align]) {
-  text-align: left;
-}
-</style>
-
-
-
-
-
-<style type = "text/css">
-.main-container {
-  max-width: 940px;
-  margin-left: auto;
-  margin-right: auto;
-}
-code {
-  color: inherit;
-  background-color: rgba(0, 0, 0, 0.04);
-}
-img {
-  max-width:100%;
-}
-.tabbed-pane {
-  padding-top: 12px;
-}
-.html-widget {
-  margin-bottom: 20px;
-}
-button.code-folding-btn:focus {
-  outline: none;
-}
-summary {
-  display: list-item;
-}
-</style>
-
-
-<style type="text/css">
-/* padding for bootstrap navbar */
-body {
-  padding-top: 51px;
-  padding-bottom: 40px;
-}
-/* offset scroll position for anchor links (for fixed navbar)  */
-.section h1 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h2 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h3 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h4 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h5 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h6 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.dropdown-submenu {
-  position: relative;
-}
-.dropdown-submenu>.dropdown-menu {
-  top: 0;
-  left: 100%;
-  margin-top: -6px;
-  margin-left: -1px;
-  border-radius: 0 6px 6px 6px;
-}
-.dropdown-submenu:hover>.dropdown-menu {
-  display: block;
-}
-.dropdown-submenu>a:after {
-  display: block;
-  content: " ";
-  float: right;
-  width: 0;
-  height: 0;
-  border-color: transparent;
-  border-style: solid;
-  border-width: 5px 0 5px 5px;
-  border-left-color: #cccccc;
-  margin-top: 5px;
-  margin-right: -10px;
-}
-.dropdown-submenu:hover>a:after {
-  border-left-color: #ffffff;
-}
-.dropdown-submenu.pull-left {
-  float: none;
-}
-.dropdown-submenu.pull-left>.dropdown-menu {
-  left: -100%;
-  margin-left: 10px;
-  border-radius: 6px 0 6px 6px;
-}
-</style>
-
 <script>
-// manage active state of menu based on current page
-$(document).ready(function () {
-  // active menu anchor
-  href = window.location.pathname
-  href = href.substr(href.lastIndexOf('/') + 1)
-  if (href === "")
-    href = "index.html";
-  var menuAnchor = $('a[href="' + href + '"]');
-
-  // mark it active
-  menuAnchor.parent().addClass('active');
-
-  // if it's got a parent navbar menu mark it active as well
-  menuAnchor.closest('li.dropdown').addClass('active');
-});
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
 </script>
 
-<!-- tabsets -->
 
-<style type="text/css">
-.tabset-dropdown > .nav-tabs {
-  display: inline-table;
-  max-height: 500px;
-  min-height: 44px;
-  overflow-y: auto;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
-  font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
-}
+<link rel="stylesheet" href="index_files/style.css" type="text/css" />
 
-.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
-  font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
-}
-
-.tabset-dropdown > .nav-tabs > li.active {
-  display: block;
-}
-
-.tabset-dropdown > .nav-tabs > li > a,
-.tabset-dropdown > .nav-tabs > li > a:focus,
-.tabset-dropdown > .nav-tabs > li > a:hover {
-  border: none;
-  display: inline-block;
-  border-radius: 4px;
-  background-color: transparent;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
-  display: block;
-  float: none;
-}
-
-.tabset-dropdown > .nav-tabs > li {
-  display: none;
-}
-</style>
-
-<!-- code folding -->
 
 
 
@@ -266,63 +126,35 @@ $(document).ready(function () {
 <body>
 
 
-<div class="container-fluid main-container">
+
+
+<section class="page-header">
+<h1 class="title toc-ignore project-name">Predict Epidemic Curves for COVID-19 with Generalized SEIR Modeling</h1>
+<h4 class="author project-author">Selcuk Korkmaz</h4>
+<h4 class="date project-date">22/06/2021</h4>
+</section>
 
 
 
-
-<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="index.html">genSEIR</a>
-    </div>
-    <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-        <li>
-  <a href="index.html">Tutorial</a>
-</li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        
-      </ul>
-    </div><!--/.nav-collapse -->
-  </div><!--/.container -->
-</div><!--/.navbar -->
-
-<div class="fluid-row" id="header">
-
-
-
-<h1 class="title toc-ignore">Predict Epidemic Curves with Generalized SEIR Modeling</h1>
-<h4 class="author">Selcuk Korkmaz</h4>
-<h4 class="date">22 06 2021</h4>
-
-</div>
-
-
+<section class="main-content">
 <div id="implementation-of-genseir-package" class="section level2">
 <h2>Implementation of genSEIR Package</h2>
 <p>First, call the <code>genSEIR</code> package:</p>
-<pre class="r"><code>library(genSEIR)</code></pre>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(genSEIR)</span></code></pre></div>
 <p>Define the country and its population:</p>
-<pre class="r"><code>country = &quot;Italy&quot;
-Npop = 60000000 </code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>country <span class="ot">=</span> <span class="st">&quot;Italy&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Npop <span class="ot">=</span> <span class="dv">66000000</span> </span></code></pre></div>
 <p>Enter desired start and finish dates in <em>mm/dd/yy</em> format. Start date cannot be earlier than 01/22/21 and finish date cannot be later than the current date - 1. If <code>start=NULL</code> then start date is set to 01/22/21 and If <code>finish=NULL</code> then finish date is set to <code>Sys.Date()-1</code>:</p>
-<pre class="r"><code>start = &quot;01/01/21&quot; 
-finish = &quot;06/20/21&quot;</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>start <span class="ot">=</span> <span class="st">&quot;01/01/21&quot;</span> </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>finish <span class="ot">=</span> <span class="st">&quot;06/01/21&quot;</span></span></code></pre></div>
 <p>Define <code>dt</code> argument which oversamples time to ensure that the algorithm converges (i.e. 1/24), and specify <code>f</code> argument for the future predictions (i.e. 30 days):</p>
-<pre class="r"><code>dt=1
-f=30</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dt<span class="ot">=</span><span class="dv">1</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>f<span class="ot">=</span><span class="dv">30</span></span></code></pre></div>
 <p>Get COVID-19 data from John-Hopkins University (<a href="https://github.com/CSSEGISandData/COVID-19" class="uri">https://github.com/CSSEGISandData/COVID-19</a>):</p>
-<pre class="r"><code>data = getDataCOVID(start = start, finish = finish, country = country)</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">=</span> <span class="fu">getDataCOVID</span>(<span class="at">start =</span> start, <span class="at">finish =</span> finish, <span class="at">country =</span> country)</span></code></pre></div>
 <p>Data for recovered cases:</p>
-<pre class="r"><code>Recovered = data$tableRecovered
-Recovered</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>Recovered <span class="ot">=</span> data<span class="sc">$</span>tableRecovered</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>Recovered</span></code></pre></div>
 <pre><code>##     ProvinceState CountryRegion      Lat     Long  1/1/21  1/2/21  1/3/21
 ## 139                       Italy 41.87194 12.56738 1479988 1489154 1503900
 ##      1/4/21  1/5/21  1/6/21  1/7/21  1/8/21  1/9/21 1/10/21 1/11/21 1/12/21
@@ -357,15 +189,11 @@ Recovered</code></pre>
 ## 139 3619586 3636089 3655112 3669407 3683189 3696481 3706084 3715389 3727220
 ##     5/19/21 5/20/21 5/21/21 5/22/21 5/23/21 5/24/21 5/25/21 5/26/21 5/27/21
 ## 139 3741149 3753965 3766660 3779293 3785866 3792898 3804246 3816176 3826984
-##     5/28/21 5/29/21 5/30/21 5/31/21  6/1/21  6/2/21  6/3/21  6/4/21  6/5/21
-## 139 3837518 3845087 3851661 3858019 3868332 3886867 3893259 3901112 3908312
-##      6/6/21  6/7/21  6/8/21  6/9/21 6/10/21 6/11/21 6/12/21 6/13/21 6/14/21
-## 139 3913633 3918657 3927176 3936088 3943704 3949597 3954097 3957557 3960951
-##     6/15/21 6/16/21 6/17/21 6/18/21 6/19/21 6/20/21
-## 139 4014025 4019424 4023957 4031605 4035692 4037996</code></pre>
+##     5/28/21 5/29/21 5/30/21 5/31/21  6/1/21
+## 139 3837518 3845087 3851661 3858019 3868332</code></pre>
 <p>Data for death cases:</p>
-<pre class="r"><code>Deaths = data$tableDeaths
-Deaths</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>Deaths <span class="ot">=</span> data<span class="sc">$</span>tableDeaths</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>Deaths</span></code></pre></div>
 <pre><code>##     ProvinceState CountryRegion      Lat     Long 1/1/21 1/2/21 1/3/21 1/4/21
 ## 154                       Italy 41.87194 12.56738  74621  74985  75332  75680
 ##     1/5/21 1/6/21 1/7/21 1/8/21 1/9/21 1/10/21 1/11/21 1/12/21 1/13/21 1/14/21
@@ -398,15 +226,11 @@ Deaths</code></pre>
 ## 154 122470 122694 122833  123031  123282  123544  123745  123927  124063
 ##     5/16/21 5/17/21 5/18/21 5/19/21 5/20/21 5/21/21 5/22/21 5/23/21 5/24/21
 ## 154  124156  124296  124497  124646  124810  125028  125153  125225  125335
-##     5/25/21 5/26/21 5/27/21 5/28/21 5/29/21 5/30/21 5/31/21 6/1/21 6/2/21
-## 154  125501  125622  125793  125919  126002  126046  126128 126221 126283
-##     6/3/21 6/4/21 6/5/21 6/6/21 6/7/21 6/8/21 6/9/21 6/10/21 6/11/21 6/12/21
-## 154 126342 126415 126472 126523 126588 126690 126767  126855  126924  126976
-##     6/13/21 6/14/21 6/15/21 6/16/21 6/17/21 6/18/21 6/19/21 6/20/21
-## 154  127002  127038  127101  127153  127190  127225  127253  127270</code></pre>
+##     5/25/21 5/26/21 5/27/21 5/28/21 5/29/21 5/30/21 5/31/21 6/1/21
+## 154  125501  125622  125793  125919  126002  126046  126128 126221</code></pre>
 <p>Data for confirmed cases:</p>
-<pre class="r"><code>Confirmed = data$tableConfirmed
-Confirmed</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>Confirmed <span class="ot">=</span> data<span class="sc">$</span>tableConfirmed</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>Confirmed</span></code></pre></div>
 <pre><code>##     ProvinceState CountryRegion      Lat     Long  1/1/21  1/2/21  1/3/21
 ## 154                       Italy 41.87194 12.56738 2129376 2141201 2155446
 ##      1/4/21  1/5/21  1/6/21  1/7/21  1/8/21  1/9/21 1/10/21 1/11/21 1/12/21
@@ -441,433 +265,109 @@ Confirmed</code></pre>
 ## 154 4116287 4123230 4131078 4139160 4146722 4153374 4159122 4162576 4167025
 ##     5/19/21 5/20/21 5/21/21 5/22/21 5/23/21 5/24/21 5/25/21 5/26/21 5/27/21
 ## 154 4172525 4178261 4183476 4188190 4192183 4194672 4197892 4201827 4205970
-##     5/28/21 5/29/21 5/30/21 5/31/21  6/1/21  6/2/21  6/3/21  6/4/21  6/5/21
-## 154 4209707 4213055 4216003 4217821 4220304 4223200 4225163 4227719 4230153
-##      6/6/21  6/7/21  6/8/21  6/9/21 6/10/21 6/11/21 6/12/21 6/13/21 6/14/21
-## 154 4232428 4233698 4235592 4237790 4239868 4241760 4243482 4244872 4245779
-##     6/15/21 6/16/21 6/17/21 6/18/21 6/19/21 6/20/21
-## 154 4247032 4248432 4249755 4250902 4252095 4252976</code></pre>
+##     5/28/21 5/29/21 5/30/21 5/31/21  6/1/21
+## 154 4209707 4213055 4216003 4217821 4220304</code></pre>
 <p>Remove first four columns since they do not include number of cases:</p>
-<pre class="r"><code>    recovered = Recovered[,5:ncol(data$tableRecovered)]
-    deaths = Deaths[,5:ncol(data$tableDeaths)]
-    confirmed = Confirmed[,5:ncol(data$tableConfirmed)]</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>    recovered <span class="ot">=</span> Recovered[,<span class="dv">5</span><span class="sc">:</span><span class="fu">ncol</span>(data<span class="sc">$</span>tableRecovered)]</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    deaths <span class="ot">=</span> Deaths[,<span class="dv">5</span><span class="sc">:</span><span class="fu">ncol</span>(data<span class="sc">$</span>tableDeaths)]</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    confirmed <span class="ot">=</span> Confirmed[,<span class="dv">5</span><span class="sc">:</span><span class="fu">ncol</span>(data<span class="sc">$</span>tableConfirmed)]</span></code></pre></div>
 <p>Define initial estimates for parameters to be optimized: <code>alpha_guess</code>: protection rate, <code>beta_guess</code>: infection rate, <code>LT_guess</code>: latent time in days, <code>Q_guess</code>: rate at which infectious people enter in quarantine, <code>lambda_guess</code>: time dependent recovery rate, <code>kappa_guess</code>: time dependent death rate. These are the parameters that define the course of the outbreak and they will be optimized in the later steps:</p>
-<pre class="r"><code>alpha_guess = 0.2 
-beta_guess = 1
-LT_guess = 2
-Q_guess = 0.3
-lambda_guess = c(0.01,0.001,10)
-kappa_guess = c(0.001,0.001,10)
-guess = c(alpha_guess, beta_guess, 1/LT_guess, Q_guess, lambda_guess, kappa_guess)
-guess</code></pre>
-<pre><code>##  [1] 2e-01 1e+00 5e-01 3e-01 1e-02 1e-03 1e+01 1e-03 1e-03 1e+01</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>alpha_guess <span class="ot">=</span> <span class="fl">0.2</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>beta_guess <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>LT_guess <span class="ot">=</span> <span class="dv">3</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>Q_guess <span class="ot">=</span> <span class="fl">0.3</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>lambda_guess <span class="ot">=</span> <span class="fu">c</span>(<span class="fl">0.01</span>,<span class="fl">0.001</span>,<span class="dv">10</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>kappa_guess <span class="ot">=</span> <span class="fu">c</span>(<span class="fl">0.001</span>,<span class="fl">0.001</span>,<span class="dv">10</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>guess <span class="ot">=</span> <span class="fu">c</span>(alpha_guess, beta_guess, <span class="dv">1</span><span class="sc">/</span>LT_guess, Q_guess, lambda_guess, kappa_guess)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>guess</span></code></pre></div>
+<pre><code>##  [1]  0.2000000  1.0000000  0.3333333  0.3000000  0.0100000  0.0010000
+##  [7] 10.0000000  0.0010000  0.0010000 10.0000000</code></pre>
 <p>Define initial conditions: <code>Q0</code>: initial number of quarantined cases, <code>I0</code>: initial number of infectious cases, <code>E0</code>: initial number of exposed cases, <code>R0</code>: initial number of recovered cases, <code>D0</code>: initial number of death cases:</p>
-<pre class="r"><code>Q0 = confirmed[1]-recovered[1]-deaths[1]
-I0 = 0.3*Q0
-E0 = 0.3*Q0
-R0 = recovered[1]
-D0 = deaths[1]</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>Q0 <span class="ot">=</span> confirmed[<span class="dv">1</span>]<span class="sc">-</span>recovered[<span class="dv">1</span>]<span class="sc">-</span>deaths[<span class="dv">1</span>]</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>I0 <span class="ot">=</span> <span class="fl">0.3</span><span class="sc">*</span>Q0</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>E0 <span class="ot">=</span> <span class="fl">0.3</span><span class="sc">*</span>Q0</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>R0 <span class="ot">=</span> recovered[<span class="dv">1</span>]</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>D0 <span class="ot">=</span> deaths[<span class="dv">1</span>]</span></code></pre></div>
 <p>Specify the number of active cases by subtracting the number of recovered and death cases from the number of confirmed cases:</p>
-<pre class="r"><code>Active = confirmed-recovered-deaths
-Active[Active&lt;0] &lt;- 0 </code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>Active <span class="ot">=</span> confirmed<span class="sc">-</span>recovered<span class="sc">-</span>deaths</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>Active[Active<span class="sc">&lt;</span><span class="dv">0</span>] <span class="ot">&lt;-</span> <span class="dv">0</span> </span></code></pre></div>
 <p>Define a time vector between start and finish dates:</p>
-<pre class="r"><code>time = seq(as.Date(start, format = &quot;%m/%d/%y&quot;), as.Date(finish, format = &quot;%m/%d/%y&quot;), by = &quot;1 day&quot;)</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>time <span class="ot">=</span> <span class="fu">seq</span>(<span class="fu">as.Date</span>(start, <span class="at">format =</span> <span class="st">&quot;%m/%d/%y&quot;</span>), <span class="fu">as.Date</span>(finish, <span class="at">format =</span> <span class="st">&quot;%m/%d/%y&quot;</span>), <span class="at">by =</span> <span class="st">&quot;1 day&quot;</span>)</span></code></pre></div>
 <p>Optimize the outbreak parameters. The following function attempts to solve the nonlinear sum of squares problem by using Nash variant of Marquardt’s approach to stabilizing the Gauss-Newton method using the Levenberg-Marquardt adjustment. This is explained in (Nash (1990) Compact numerical methods for computers: linear algebra and function minimisation. CRC press.):</p>
-<pre class="r"><code>Q=Active
-R=recovered
-D = deaths
-
-params = fit_SEIQRDP(Q, R, D, Npop = Npop, E0 = E0, I0 = I0,
-                         time = time, dt = dt, guess = guess, ftol = 1e-6,
-                         ptol = 1e-6, gtol = 1e-6, epsfcn = 0.001, factor = 100, maxfev = 1000,
-                         maxiter = 100, nprint = 1, trace = FALSE)</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>Q<span class="ot">=</span>Active</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>R<span class="ot">=</span>recovered</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>D <span class="ot">=</span> deaths</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>params <span class="ot">=</span> <span class="fu">fit_SEIQRDP</span>(Q, R, D, <span class="at">Npop =</span> Npop, <span class="at">E0 =</span> E0, <span class="at">I0 =</span> I0,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>                         <span class="at">time =</span> time, <span class="at">dt =</span> dt, <span class="at">guess =</span> guess, <span class="at">ftol =</span> <span class="fl">1e-6</span>,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>                         <span class="at">ptol =</span> <span class="fl">1e-6</span>, <span class="at">gtol =</span> <span class="fl">1e-6</span>, <span class="at">epsfcn =</span> <span class="fl">0.001</span>, <span class="at">factor =</span> <span class="dv">100</span>, <span class="at">maxfev =</span> <span class="dv">1000</span>,</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>                         <span class="at">maxiter =</span> <span class="dv">100</span>, <span class="at">nprint =</span> <span class="dv">1</span>, <span class="at">trace =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <p>Optimized parameters:</p>
-<pre class="r"><code>params</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>params</span></code></pre></div>
 <pre><code>## $alpha1
-## [1] 0.1513072
+## [1] 0.01774419
 ## 
 ## $beta1
-## [1] 0.9113984
+## [1] 0.249738
 ## 
 ## $gamma1
-## [1] 0.08435382
+## [1] 0.0277921
 ## 
 ## $delta1
-## [1] 0.009391794
+## [1] 0.08500327
 ## 
 ## $Lambda1
-## [1] 9.051000e-02 3.672407e-03 2.000000e+02
+## [1] 8.087599e-02 2.062258e-03 2.000000e+02
 ## 
 ## $Kappa1
-## [1] 6.836119e-04 1.280351e-02 5.218208e+01
+## [1]  0.001712024  0.010674346 20.000012829
 ## 
 ## $lambdaFun
 ## function(a,t) {a[1] / (1+exp(-a[2]*(t-a[3])))}
-## &lt;bytecode: 0x7fa895b5dc00&gt;
-## &lt;environment: 0x7fa8953e0e70&gt;
+## &lt;bytecode: 0x7f8f361099d0&gt;
+## &lt;environment: 0x7f8f34454820&gt;
 ## 
 ## $kappaFun
 ## function(a,t) {a[1]*exp(-(a[2]*(t-a[3]))^2)}
-## &lt;bytecode: 0x7fa89a8093c0&gt;
-## &lt;environment: 0x7fa896fe68e8&gt;</code></pre>
+## &lt;bytecode: 0x7f8f33e89858&gt;
+## &lt;environment: 0x7f8f33d29458&gt;</code></pre>
 <p>Obtain predicted cases including susceptible, exposed, infectious, quarantined, recovered, dead and insusceptible using a generalized SEIR model:</p>
-<pre class="r"><code>result = SEIQRDP(alpha = params$alpha1, beta = params$beta1,
-              gamma = params$gamma1, delta = params$delta1,
-              lambda0 = params$Lambda1, kappa0 = params$Kappa1,
-              Npop, E0, I0, Q0, R0, D0, lambdaFun = params$lambdaFun,
-              kappaFun = params$kappaFun, tstart = start, tfinish = finish,
-              dt = dt, f = f)</code></pre>
-<p>Predicted results:</p>
-<pre class="r"><code>result</code></pre>
-<pre><code>## $susceptible
-##   [1] 5.752576e+07 4.930842e+07 4.225208e+07 3.618859e+07 3.097631e+07
-##   [6] 2.649511e+07 2.264273e+07 1.933176e+07 1.648737e+07 1.404529e+07
-##  [11] 1.195023e+07 1.015455e+07 8.617125e+06 7.302389e+06 6.179569e+06
-##  [16] 5.222009e+06 4.406605e+06 3.713333e+06 3.124838e+06 2.626092e+06
-##  [21] 2.204093e+06 1.847606e+06 1.546937e+06 1.293737e+06 1.080830e+06
-##  [26] 9.020615e+05 7.521626e+05 6.266341e+05 5.216425e+05 4.339282e+05
-##  [31] 3.607262e+05 2.996955e+05 2.488586e+05 2.065480e+05 1.713601e+05
-##  [36] 1.421159e+05 1.178262e+05 9.766257e+04 8.093223e+04 6.705641e+04
-##  [41] 5.555225e+04 4.601736e+04 3.811668e+04 3.157154e+04 2.615028e+04
-##  [46] 2.166050e+04 1.794251e+04 1.486381e+04 1.231454e+04 1.020367e+04
-##  [51] 8.455738e+03 7.008271e+03 5.809525e+03 4.816664e+03 3.994233e+03
-##  [56] 3.312883e+03 2.748330e+03 2.280475e+03 1.892687e+03 1.571203e+03
-##  [61] 1.304634e+03 1.083552e+03 9.001564e+02 7.479886e+02 6.217020e+02
-##  [66] 5.168699e+02 4.298263e+02 3.575348e+02 2.974803e+02 2.475785e+02
-##  [71] 2.061025e+02 1.716206e+02 1.429459e+02 1.190940e+02 9.924860e+01
-##  [76] 8.273225e+01 6.898285e+01 5.753380e+01 4.799769e+01 4.005276e+01
-##  [81] 3.343175e+01 2.791256e+01 2.331062e+01 1.947246e+01 1.627048e+01
-##  [86] 1.359851e+01 1.136824e+01 9.506173e+00 7.951108e+00 6.652096e+00
-##  [91] 5.566695e+00 4.659547e+00 3.901185e+00 3.267045e+00 2.736646e+00
-##  [96] 2.292906e+00 1.921574e+00 1.610759e+00 1.350534e+00 1.132613e+00
-## [101] 9.500739e-01 7.971358e-01 6.689683e-01 5.615342e-01 4.714585e-01
-## [106] 3.959191e-01 3.325556e-01 2.793935e-01 2.347802e-01 1.973327e-01
-## [111] 1.658930e-01 1.394916e-01 1.173162e-01 9.868626e-02 8.303169e-02
-## [116] 6.987447e-02 5.881389e-02 4.951389e-02 4.169264e-02 3.511365e-02
-## [121] 2.957850e-02 2.492063e-02 2.100022e-02 1.769986e-02 1.492094e-02
-## [126] 1.258063e-02 1.060932e-02 8.948515e-03 7.549041e-03 6.369559e-03
-## [131] 5.375304e-03 4.537033e-03 3.830147e-03 3.233947e-03 2.731012e-03
-## [136] 2.306677e-03 1.948596e-03 1.646372e-03 1.391248e-03 1.175848e-03
-## [141] 9.939551e-04 8.403320e-04 7.105636e-04 6.009276e-04 5.082858e-04
-## [146] 4.299914e-04 3.638119e-04 3.078638e-04 2.605581e-04 2.205535e-04
-## [151] 1.867180e-04 1.580960e-04 1.338804e-04 1.133900e-04 9.604893e-05
-## [156] 8.137116e-05 6.894580e-05 5.842571e-05 4.951747e-05 4.197306e-05
-## [161] 3.558280e-05 3.016936e-05 2.558281e-05 2.169631e-05 1.840258e-05
-## [166] 1.561083e-05 1.324425e-05 1.123782e-05 9.536522e-06 8.093760e-06
-## [171] 6.870093e-06 5.832120e-06 4.951552e-06 4.204426e-06 3.570443e-06
-## [176] 3.032405e-06 2.575736e-06 2.188085e-06 1.858982e-06 1.579552e-06
-## [181] 1.342270e-06 1.140756e-06 9.695985e-07 8.242086e-07 7.006932e-07
-## [186] 5.957495e-07 5.065755e-07 4.307933e-07 3.663849e-07 3.116373e-07
-## [191] 2.650968e-07 2.255288e-07 1.918854e-07 1.632764e-07 1.389461e-07
-## [196] 1.182525e-07 1.006503e-07 8.567613e-08 7.293644e-08 6.209673e-08
-## [201] 5.287277e-08
-## 
-## $exposed
-##   [1] 1.724301e+05 3.029736e+05 4.155552e+05 5.169236e+05 6.103106e+05
-##   [6] 6.969681e+05 7.770520e+05 8.501526e+05 9.156235e+05 9.727893e+05
-##  [11] 1.021075e+06 1.060079e+06 1.089617e+06 1.109726e+06 1.120657e+06
-##  [16] 1.122852e+06 1.116913e+06 1.103564e+06 1.083616e+06 1.057928e+06
-##  [21] 1.027379e+06 9.928365e+05 9.551344e+05 9.150563e+05 8.733221e+05
-##  [26] 8.305797e+05 7.874015e+05 7.442829e+05 7.016446e+05 6.598360e+05
-##  [31] 6.191404e+05 5.797810e+05 5.419273e+05 5.057015e+05 4.711850e+05
-##  [36] 4.384245e+05 4.074376e+05 3.782181e+05 3.507402e+05 3.249629e+05
-##  [41] 3.008334e+05 2.782902e+05 2.572653e+05 2.376869e+05 2.194805e+05
-##  [46] 2.025710e+05 1.868833e+05 1.723436e+05 1.588796e+05 1.464216e+05
-##  [51] 1.349027e+05 1.242587e+05 1.144288e+05 1.053552e+05 9.698357e+04
-##  [56] 8.926270e+04 8.214457e+04 7.558425e+04 6.953977e+04 6.397200e+04
-##  [61] 5.884453e+04 5.412352e+04 4.977755e+04 4.577747e+04 4.209632e+04
-##  [66] 3.870910e+04 3.559272e+04 3.272582e+04 3.008868e+04 2.766309e+04
-##  [71] 2.543224e+04 2.338066e+04 2.149403e+04 1.975920e+04 1.816403e+04
-##  [76] 1.669733e+04 1.534882e+04 1.410902e+04 1.296919e+04 1.192131e+04
-##  [81] 1.095797e+04 1.007239e+04 9.258302e+03 8.509945e+03 7.822025e+03
-##  [86] 7.189671e+03 6.608401e+03 6.074096e+03 5.582966e+03 5.131526e+03
-##  [91] 4.716573e+03 4.335161e+03 3.984580e+03 3.662341e+03 3.366153e+03
-##  [96] 3.093913e+03 2.843685e+03 2.613691e+03 2.402294e+03 2.207992e+03
-## [101] 2.029403e+03 1.865257e+03 1.714386e+03 1.575716e+03 1.448262e+03
-## [106] 1.331116e+03 1.223445e+03 1.124482e+03 1.033524e+03 9.499226e+02
-## [111] 8.730834e+02 8.024595e+02 7.375480e+02 6.778871e+02 6.230519e+02
-## [116] 5.726523e+02 5.263295e+02 4.837537e+02 4.446218e+02 4.086554e+02
-## [121] 3.755982e+02 3.452151e+02 3.172897e+02 2.916233e+02 2.680330e+02
-## [126] 2.463510e+02 2.264229e+02 2.081068e+02 1.912724e+02 1.757997e+02
-## [131] 1.615787e+02 1.485081e+02 1.364947e+02 1.254532e+02 1.153048e+02
-## [136] 1.059774e+02 9.740450e+01 8.952510e+01 8.228308e+01 7.562690e+01
-## [141] 6.950915e+01 6.388630e+01 5.871829e+01 5.396835e+01 4.960264e+01
-## [146] 4.559010e+01 4.190214e+01 3.851251e+01 3.539709e+01 3.253368e+01
-## [151] 2.990190e+01 2.748302e+01 2.525981e+01 2.321645e+01 2.133838e+01
-## [156] 1.961224e+01 1.802572e+01 1.656755e+01 1.522734e+01 1.399554e+01
-## [161] 1.286339e+01 1.182282e+01 1.086642e+01 9.987394e+00 9.179474e+00
-## [166] 8.436910e+00 7.754415e+00 7.127130e+00 6.550588e+00 6.020685e+00
-## [171] 5.533648e+00 5.086010e+00 4.674582e+00 4.296437e+00 3.948881e+00
-## [176] 3.629440e+00 3.335840e+00 3.065991e+00 2.817971e+00 2.590014e+00
-## [181] 2.380498e+00 2.187930e+00 2.010939e+00 1.848267e+00 1.698753e+00
-## [186] 1.561334e+00 1.435032e+00 1.318946e+00 1.212251e+00 1.114188e+00
-## [191] 1.024057e+00 9.412165e-01 8.650778e-01 7.950982e-01 7.307796e-01
-## [196] 6.716639e-01 6.173304e-01 5.673921e-01 5.214935e-01 4.793078e-01
-## [201] 4.405347e-01
-## 
-## $infectious
-##   [1]  172430.1  190861.1  219314.3  256475.7  301460.2  353578.0  412203.9
-##   [8]  476707.9  546421.0  620625.3  698556.8  779418.2  862394.8  946673.8
-##  [15] 1031461.9 1116002.8 1199590.9 1281583.0 1361406.6 1438564.4 1512637.0
-##  [22] 1583282.0 1650231.8 1713289.0 1772321.3 1827254.8 1878067.6 1924782.7
-##  [29] 1967461.5 2006196.8 2041107.2 2072331.6 2100023.7 2124348.1 2145476.6
-##  [36] 2163584.5 2178848.2 2191442.9 2201540.9 2209310.0 2214912.5 2218504.4
-##  [43] 2220234.7 2220245.3 2218670.6 2215637.2 2211264.6 2205664.7 2198942.3
-##  [50] 2191195.1 2182514.5 2172985.2 2162686.0 2151690.1 2140065.0 2127873.5
-##  [57] 2115173.4 2102018.2 2088457.2 2074535.7 2060295.7 2045775.7 2031011.0
-##  [64] 2016034.2 2000875.1 1985561.2 1970117.6 1954567.4 1938931.6 1923229.6
-##  [71] 1907479.0 1891696.0 1875895.4 1860090.5 1844293.6 1828516.0 1812767.7
-##  [78] 1797058.1 1781395.5 1765787.5 1750241.0 1734762.4 1719357.0 1704030.2
-##  [85] 1688786.4 1673629.7 1658563.7 1643591.8 1628716.8 1613941.3 1599267.6
-##  [92] 1584697.7 1570233.2 1555875.8 1541626.6 1527486.7 1513457.1 1499538.5
-##  [99] 1485731.5 1472036.6 1458454.0 1444984.0 1431626.7 1418382.1 1405250.2
-## [106] 1392230.8 1379323.6 1366528.4 1353844.9 1341272.6 1328811.1 1316459.9
-## [113] 1304218.4 1292086.2 1280062.6 1268146.9 1256338.6 1244636.9 1233041.2
-## [120] 1221550.8 1210164.8 1198882.7 1187703.5 1176626.6 1165651.2 1154776.4
-## [127] 1144001.6 1133325.9 1122748.5 1112268.7 1101885.5 1091598.3 1081406.2
-## [134] 1071308.4 1061304.1 1051392.5 1041572.8 1031844.2 1022205.9 1012657.1
-## [141] 1003197.0  993824.9  984539.9  975341.4  966228.4  957200.2  948256.2
-## [148]  939395.4  930617.2  921920.8  913305.5  904770.4  896315.0  887938.4
-## [155]  879640.0  871419.0  863274.7  855206.4  847213.4  839295.0  831450.6
-## [162]  823679.4  815980.7  808353.9  800798.4  793313.4  785898.3  778552.5
-## [169]  771275.3  764066.1  756924.2  749849.0  742840.0  735896.4  729017.7
-## [176]  722203.3  715452.6  708764.9  702139.8  695576.5  689074.6  682633.4
-## [183]  676252.5  669931.1  663668.9  657465.1  651319.4  645231.1  639199.7
-## [190]  633224.7  627305.5  621441.6  615632.6  609877.8  604176.8  598529.1
-## [197]  592934.3  587391.7  581900.9  576461.4  571072.8
-## 
-## $quarantined
-##   [1] 574767.0 559574.6 545002.7 531121.4 517988.8 505653.9 494158.0 483535.3
-##   [9] 473812.7 465009.7 457138.2 450202.3 444198.1 439114.2 434932.0 431625.8
-##  [17] 429163.9 427509.2 426619.6 426449.5 426950.0 428070.4 429758.2 431960.6
-##  [25] 434624.5 437697.6 441128.6 444867.8 448867.3 453081.5 457467.0 461983.0
-##  [33] 466591.4 471256.7 475946.1 480629.3 485278.7 489869.5 494378.8 498786.4
-##  [41] 503074.2 507226.2 511228.3 515068.3 518735.8 522221.7 525518.7 528620.8
-##  [49] 531523.0 534221.7 536714.2 538998.9 541074.9 542942.1 544601.3 546053.6
-##  [57] 547300.9 548345.6 549190.4 549838.5 550293.4 550558.8 550638.9 550537.9
-##  [65] 550260.2 549810.5 549193.5 548414.0 547476.9 546387.1 545149.6 543769.4
-##  [73] 542251.5 540600.8 538822.4 536921.1 534901.8 532769.2 530528.1 528183.2
-##  [81] 525739.1 523200.2 520571.0 517855.8 515058.9 512184.3 509236.1 506218.3
-##  [89] 503134.7 499989.0 496784.8 493525.8 490215.2 486856.6 483453.0 480007.6
-##  [97] 476523.6 473003.7 469450.8 465867.7 462257.0 458621.4 454963.2 451284.9
-## [105] 447588.7 443876.9 440151.6 436414.8 432668.6 428914.8 425155.3 421391.7
-## [113] 417625.9 413859.3 410093.6 406330.2 402570.5 398816.0 395067.8 391327.2
-## [121] 387595.5 383873.7 380162.9 376464.1 372778.4 369106.7 365449.7 361808.5
-## [129] 358183.7 354576.1 350986.5 347415.6 343863.8 340332.0 336820.6 333330.1
-## [137] 329861.2 326414.2 322989.5 319587.7 316209.1 312854.0 309522.9 306215.9
-## [145] 302933.4 299675.6 296442.9 293235.3 290053.2 286896.7 283765.9 280661.0
-## [153] 277582.1 274529.4 271502.9 268502.7 265528.9 262581.5 259660.6 256766.2
-## [161] 253898.3 251056.9 248241.9 245453.5 242691.5 239955.9 237246.7 234563.8
-## [169] 231907.1 229276.5 226672.1 224093.6 221541.0 219014.2 216513.1 214037.5
-## [177] 211587.4 209162.6 206763.0 204388.4 202038.8 199713.9 197413.6 195137.8
-## [185] 192886.3 190658.9 188455.5 186276.0 184120.1 181987.7 179878.6 177792.6
-## [193] 175729.6 173689.4 171671.8 169676.6 167703.6 165752.7 163823.6 161916.2
-## [201] 160030.4
-## 
-## $recovered
-##   [1] 1479988 1496630 1512875 1528741 1544246 1559413 1574263 1588820 1603109
-##  [10] 1617156 1630987 1644630 1658111 1671458 1684697 1697855 1710957 1724028
-##  [19] 1737093 1750173 1763290 1776464 1789713 1803055 1816505 1830076 1843782
-##  [28] 1857633 1871639 1885808 1900146 1914659 1929352 1944226 1959285 1974530
-##  [37] 1989959 2005574 2021371 2037350 2053507 2069838 2086340 2103008 2119838
-##  [46] 2136825 2153962 2171244 2188666 2206220 2223901 2241703 2259618 2277641
-##  [55] 2295764 2313981 2332286 2350671 2369131 2387659 2406248 2424892 2443584
-##  [64] 2462319 2481091 2499893 2518720 2537566 2556425 2575293 2594163 2613030
-##  [73] 2631890 2650737 2669568 2688376 2707158 2725909 2744626 2763303 2781938
-##  [82] 2800526 2819064 2837549 2855976 2874342 2892645 2910882 2929049 2947144
-##  [91] 2965164 2983107 3000970 3018751 3036448 3054058 3071580 3089011 3106351
-## [100] 3123597 3140747 3157801 3174756 3191611 3208365 3225018 3241566 3258011
-## [109] 3274350 3290583 3306709 3322727 3338637 3354437 3370128 3385708 3401178
-## [118] 3416536 3431783 3446918 3461940 3476851 3491648 3506333 3520905 3535365
-## [127] 3549711 3563945 3578065 3592073 3605969 3619751 3633422 3646980 3660427
-## [136] 3673762 3686985 3700098 3713100 3725991 3738773 3751445 3764008 3776462
-## [145] 3788808 3801046 3813177 3825201 3837119 3848931 3860638 3872240 3883738
-## [154] 3895133 3906424 3917613 3928701 3939687 3950573 3961359 3972045 3982633
-## [163] 3993123 4003516 4013812 4024012 4034117 4044127 4054043 4063866 4073596
-## [172] 4083235 4092782 4102238 4111604 4120882 4130071 4139172 4148186 4157113
-## [181] 4165955 4174712 4183384 4191973 4200479 4208903 4217245 4225506 4233687
-## [190] 4241788 4249811 4257756 4265623 4273413 4281127 4288766 4296329 4303819
-## [199] 4311235 4318579 4325850
-## 
-## $dead
-##   [1]  74621.00  74869.10  75114.81  75358.21  75599.38  75838.49  76075.70
-##   [8]  76311.25  76545.37  76778.35  77010.49  77242.12  77473.59  77705.25
-##  [15]  77937.50  78170.69  78405.20  78641.43  78879.72  79120.45  79363.94
-##  [22]  79610.53  79860.51  80114.16  80371.75  80633.49  80899.60  81170.23
-##  [29]  81445.54  81725.64  82010.61  82300.53  82595.40  82895.26  83200.06
-##  [36]  83509.78  83824.33  84143.64  84467.59  84796.05  85128.88  85465.92
-##  [43]  85806.97  86151.86  86500.38  86852.31  87207.43  87565.50  87926.28
-##  [50]  88289.52  88654.98  89022.39  89391.49  89762.02  90133.72  90506.32
-##  [57]  90879.55  91253.17  91626.90  92000.48  92373.67  92746.20  93117.84
-##  [64]  93488.33  93857.45  94224.96  94590.63  94954.24  95315.59  95674.46
-##  [71]  96030.65  96383.98  96734.26  97081.31  97424.97  97765.06  98101.45
-##  [78]  98433.98  98762.52  99086.94  99407.12  99722.94 100034.30 100341.10
-##  [85] 100643.26 100940.69 101233.31 101521.07 101803.89 102081.73 102354.55
-##  [92] 102622.30 102884.96 103142.49 103394.88 103642.12 103884.19 104121.11
-##  [99] 104352.87 104579.48 104800.96 105017.33 105228.61 105434.83 105636.03
-## [106] 105832.24 106023.50 106209.86 106391.37 106568.08 106740.05 106907.32
-## [113] 107069.97 107228.06 107381.64 107530.79 107675.58 107816.08 107952.35
-## [120] 108084.49 108212.55 108336.61 108456.76 108573.07 108685.62 108794.49
-## [127] 108899.76 109001.51 109099.82 109194.76 109286.42 109374.89 109460.23
-## [134] 109542.52 109621.86 109698.31 109771.94 109842.85 109911.10 109976.78
-## [141] 110039.94 110100.67 110159.05 110215.13 110268.99 110320.71 110370.34
-## [148] 110417.96 110463.62 110507.40 110549.36 110589.55 110628.05 110664.90
-## [155] 110700.17 110733.90 110766.17 110797.01 110826.48 110854.64 110881.53
-## [162] 110907.20 110931.70 110955.07 110977.35 110998.60 111018.84 111038.13
-## [169] 111056.50 111073.98 111090.62 111106.45 111121.50 111135.82 111149.42
-## [176] 111162.34 111174.61 111186.26 111197.32 111207.81 111217.76 111227.19
-## [183] 111236.13 111244.60 111252.62 111260.21 111267.40 111274.20 111280.64
-## [190] 111286.72 111292.47 111297.90 111303.03 111307.88 111312.45 111316.77
-## [197] 111320.84 111324.68 111328.30 111331.71 111334.92
-## 
-## $insusceptible
-##   [1]        0  8066676 14980062 20902786 25974085 30313435 34023523 37192712
-##   [9] 39897119 42202354 44165002 45833875 47251080 48452934 49470745 50331485
-##  [17] 51058365 51671341 52187548 52621673 52986287 53292131 53548365 53762788
-##  [25] 53942026 54091697 54216558 54320629 54407299 54479424 54539402 54589249
-##  [33] 54630652 54665024 54693547 54717207 54736826 54753090 54766569 54777738
-##  [41] 54786992 54794658 54801008 54806268 54810624 54814233 54817222 54819698
-##  [49] 54821749 54823448 54824857 54826024 54826991 54827793 54828458 54829010
-##  [57] 54829467 54829847 54830162 54830423 54830640 54830821 54830970 54831095
-##  [65] 54831198 54831284 54831355 54831415 54831464 54831505 54831540 54831568
-##  [73] 54831592 54831612 54831628 54831642 54831653 54831663 54831671 54831678
-##  [81] 54831683 54831688 54831692 54831695 54831698 54831700 54831702 54831703
-##  [89] 54831705 54831706 54831707 54831707 54831708 54831709 54831709 54831709
-##  [97] 54831710 54831710 54831710 54831710 54831711 54831711 54831711 54831711
-## [105] 54831711 54831711 54831711 54831711 54831711 54831711 54831711 54831711
-## [113] 54831711 54831711 54831711 54831711 54831711 54831711 54831711 54831711
-## [121] 54831711 54831711 54831711 54831711 54831711 54831711 54831711 54831711
-## [129] 54831711 54831711 54831711 54831711 54831711 54831711 54831711 54831711
-## [137] 54831711 54831711 54831711 54831711 54831711 54831711 54831711 54831711
-## [145] 54831711 54831711 54831711 54831711 54831711 54831711 54831711 54831711
-## [153] 54831711 54831711 54831711 54831711 54831711 54831711 54831711 54831711
-## [161] 54831711 54831711 54831711 54831711 54831711 54831711 54831711 54831711
-## [169] 54831711 54831711 54831711 54831711 54831711 54831711 54831711 54831711
-## [177] 54831711 54831711 54831711 54831711 54831711 54831711 54831711 54831711
-## [185] 54831711 54831711 54831711 54831711 54831711 54831711 54831711 54831711
-## [193] 54831711 54831711 54831711 54831711 54831711 54831711 54831711 54831711
-## [201] 54831711
-## 
-## $realTime
-##   [1] &quot;2021-01-01&quot; &quot;2021-01-02&quot; &quot;2021-01-03&quot; &quot;2021-01-04&quot; &quot;2021-01-05&quot;
-##   [6] &quot;2021-01-06&quot; &quot;2021-01-07&quot; &quot;2021-01-08&quot; &quot;2021-01-09&quot; &quot;2021-01-10&quot;
-##  [11] &quot;2021-01-11&quot; &quot;2021-01-12&quot; &quot;2021-01-13&quot; &quot;2021-01-14&quot; &quot;2021-01-15&quot;
-##  [16] &quot;2021-01-16&quot; &quot;2021-01-17&quot; &quot;2021-01-18&quot; &quot;2021-01-19&quot; &quot;2021-01-20&quot;
-##  [21] &quot;2021-01-21&quot; &quot;2021-01-22&quot; &quot;2021-01-23&quot; &quot;2021-01-24&quot; &quot;2021-01-25&quot;
-##  [26] &quot;2021-01-26&quot; &quot;2021-01-27&quot; &quot;2021-01-28&quot; &quot;2021-01-29&quot; &quot;2021-01-30&quot;
-##  [31] &quot;2021-01-31&quot; &quot;2021-02-01&quot; &quot;2021-02-02&quot; &quot;2021-02-03&quot; &quot;2021-02-04&quot;
-##  [36] &quot;2021-02-05&quot; &quot;2021-02-06&quot; &quot;2021-02-07&quot; &quot;2021-02-08&quot; &quot;2021-02-09&quot;
-##  [41] &quot;2021-02-10&quot; &quot;2021-02-11&quot; &quot;2021-02-12&quot; &quot;2021-02-13&quot; &quot;2021-02-14&quot;
-##  [46] &quot;2021-02-15&quot; &quot;2021-02-16&quot; &quot;2021-02-17&quot; &quot;2021-02-18&quot; &quot;2021-02-19&quot;
-##  [51] &quot;2021-02-20&quot; &quot;2021-02-21&quot; &quot;2021-02-22&quot; &quot;2021-02-23&quot; &quot;2021-02-24&quot;
-##  [56] &quot;2021-02-25&quot; &quot;2021-02-26&quot; &quot;2021-02-27&quot; &quot;2021-02-28&quot; &quot;2021-03-01&quot;
-##  [61] &quot;2021-03-02&quot; &quot;2021-03-03&quot; &quot;2021-03-04&quot; &quot;2021-03-05&quot; &quot;2021-03-06&quot;
-##  [66] &quot;2021-03-07&quot; &quot;2021-03-08&quot; &quot;2021-03-09&quot; &quot;2021-03-10&quot; &quot;2021-03-11&quot;
-##  [71] &quot;2021-03-12&quot; &quot;2021-03-13&quot; &quot;2021-03-14&quot; &quot;2021-03-15&quot; &quot;2021-03-16&quot;
-##  [76] &quot;2021-03-17&quot; &quot;2021-03-18&quot; &quot;2021-03-19&quot; &quot;2021-03-20&quot; &quot;2021-03-21&quot;
-##  [81] &quot;2021-03-22&quot; &quot;2021-03-23&quot; &quot;2021-03-24&quot; &quot;2021-03-25&quot; &quot;2021-03-26&quot;
-##  [86] &quot;2021-03-27&quot; &quot;2021-03-28&quot; &quot;2021-03-29&quot; &quot;2021-03-30&quot; &quot;2021-03-31&quot;
-##  [91] &quot;2021-04-01&quot; &quot;2021-04-02&quot; &quot;2021-04-03&quot; &quot;2021-04-04&quot; &quot;2021-04-05&quot;
-##  [96] &quot;2021-04-06&quot; &quot;2021-04-07&quot; &quot;2021-04-08&quot; &quot;2021-04-09&quot; &quot;2021-04-10&quot;
-## [101] &quot;2021-04-11&quot; &quot;2021-04-12&quot; &quot;2021-04-13&quot; &quot;2021-04-14&quot; &quot;2021-04-15&quot;
-## [106] &quot;2021-04-16&quot; &quot;2021-04-17&quot; &quot;2021-04-18&quot; &quot;2021-04-19&quot; &quot;2021-04-20&quot;
-## [111] &quot;2021-04-21&quot; &quot;2021-04-22&quot; &quot;2021-04-23&quot; &quot;2021-04-24&quot; &quot;2021-04-25&quot;
-## [116] &quot;2021-04-26&quot; &quot;2021-04-27&quot; &quot;2021-04-28&quot; &quot;2021-04-29&quot; &quot;2021-04-30&quot;
-## [121] &quot;2021-05-01&quot; &quot;2021-05-02&quot; &quot;2021-05-03&quot; &quot;2021-05-04&quot; &quot;2021-05-05&quot;
-## [126] &quot;2021-05-06&quot; &quot;2021-05-07&quot; &quot;2021-05-08&quot; &quot;2021-05-09&quot; &quot;2021-05-10&quot;
-## [131] &quot;2021-05-11&quot; &quot;2021-05-12&quot; &quot;2021-05-13&quot; &quot;2021-05-14&quot; &quot;2021-05-15&quot;
-## [136] &quot;2021-05-16&quot; &quot;2021-05-17&quot; &quot;2021-05-18&quot; &quot;2021-05-19&quot; &quot;2021-05-20&quot;
-## [141] &quot;2021-05-21&quot; &quot;2021-05-22&quot; &quot;2021-05-23&quot; &quot;2021-05-24&quot; &quot;2021-05-25&quot;
-## [146] &quot;2021-05-26&quot; &quot;2021-05-27&quot; &quot;2021-05-28&quot; &quot;2021-05-29&quot; &quot;2021-05-30&quot;
-## [151] &quot;2021-05-31&quot; &quot;2021-06-01&quot; &quot;2021-06-02&quot; &quot;2021-06-03&quot; &quot;2021-06-04&quot;
-## [156] &quot;2021-06-05&quot; &quot;2021-06-06&quot; &quot;2021-06-07&quot; &quot;2021-06-08&quot; &quot;2021-06-09&quot;
-## [161] &quot;2021-06-10&quot; &quot;2021-06-11&quot; &quot;2021-06-12&quot; &quot;2021-06-13&quot; &quot;2021-06-14&quot;
-## [166] &quot;2021-06-15&quot; &quot;2021-06-16&quot; &quot;2021-06-17&quot; &quot;2021-06-18&quot; &quot;2021-06-19&quot;
-## [171] &quot;2021-06-20&quot;
-## 
-## $simTime
-##   [1] &quot;2021-01-01&quot; &quot;2021-01-02&quot; &quot;2021-01-03&quot; &quot;2021-01-04&quot; &quot;2021-01-05&quot;
-##   [6] &quot;2021-01-06&quot; &quot;2021-01-07&quot; &quot;2021-01-08&quot; &quot;2021-01-09&quot; &quot;2021-01-10&quot;
-##  [11] &quot;2021-01-11&quot; &quot;2021-01-12&quot; &quot;2021-01-13&quot; &quot;2021-01-14&quot; &quot;2021-01-15&quot;
-##  [16] &quot;2021-01-16&quot; &quot;2021-01-17&quot; &quot;2021-01-18&quot; &quot;2021-01-19&quot; &quot;2021-01-20&quot;
-##  [21] &quot;2021-01-21&quot; &quot;2021-01-22&quot; &quot;2021-01-23&quot; &quot;2021-01-24&quot; &quot;2021-01-25&quot;
-##  [26] &quot;2021-01-26&quot; &quot;2021-01-27&quot; &quot;2021-01-28&quot; &quot;2021-01-29&quot; &quot;2021-01-30&quot;
-##  [31] &quot;2021-01-31&quot; &quot;2021-02-01&quot; &quot;2021-02-02&quot; &quot;2021-02-03&quot; &quot;2021-02-04&quot;
-##  [36] &quot;2021-02-05&quot; &quot;2021-02-06&quot; &quot;2021-02-07&quot; &quot;2021-02-08&quot; &quot;2021-02-09&quot;
-##  [41] &quot;2021-02-10&quot; &quot;2021-02-11&quot; &quot;2021-02-12&quot; &quot;2021-02-13&quot; &quot;2021-02-14&quot;
-##  [46] &quot;2021-02-15&quot; &quot;2021-02-16&quot; &quot;2021-02-17&quot; &quot;2021-02-18&quot; &quot;2021-02-19&quot;
-##  [51] &quot;2021-02-20&quot; &quot;2021-02-21&quot; &quot;2021-02-22&quot; &quot;2021-02-23&quot; &quot;2021-02-24&quot;
-##  [56] &quot;2021-02-25&quot; &quot;2021-02-26&quot; &quot;2021-02-27&quot; &quot;2021-02-28&quot; &quot;2021-03-01&quot;
-##  [61] &quot;2021-03-02&quot; &quot;2021-03-03&quot; &quot;2021-03-04&quot; &quot;2021-03-05&quot; &quot;2021-03-06&quot;
-##  [66] &quot;2021-03-07&quot; &quot;2021-03-08&quot; &quot;2021-03-09&quot; &quot;2021-03-10&quot; &quot;2021-03-11&quot;
-##  [71] &quot;2021-03-12&quot; &quot;2021-03-13&quot; &quot;2021-03-14&quot; &quot;2021-03-15&quot; &quot;2021-03-16&quot;
-##  [76] &quot;2021-03-17&quot; &quot;2021-03-18&quot; &quot;2021-03-19&quot; &quot;2021-03-20&quot; &quot;2021-03-21&quot;
-##  [81] &quot;2021-03-22&quot; &quot;2021-03-23&quot; &quot;2021-03-24&quot; &quot;2021-03-25&quot; &quot;2021-03-26&quot;
-##  [86] &quot;2021-03-27&quot; &quot;2021-03-28&quot; &quot;2021-03-29&quot; &quot;2021-03-30&quot; &quot;2021-03-31&quot;
-##  [91] &quot;2021-04-01&quot; &quot;2021-04-02&quot; &quot;2021-04-03&quot; &quot;2021-04-04&quot; &quot;2021-04-05&quot;
-##  [96] &quot;2021-04-06&quot; &quot;2021-04-07&quot; &quot;2021-04-08&quot; &quot;2021-04-09&quot; &quot;2021-04-10&quot;
-## [101] &quot;2021-04-11&quot; &quot;2021-04-12&quot; &quot;2021-04-13&quot; &quot;2021-04-14&quot; &quot;2021-04-15&quot;
-## [106] &quot;2021-04-16&quot; &quot;2021-04-17&quot; &quot;2021-04-18&quot; &quot;2021-04-19&quot; &quot;2021-04-20&quot;
-## [111] &quot;2021-04-21&quot; &quot;2021-04-22&quot; &quot;2021-04-23&quot; &quot;2021-04-24&quot; &quot;2021-04-25&quot;
-## [116] &quot;2021-04-26&quot; &quot;2021-04-27&quot; &quot;2021-04-28&quot; &quot;2021-04-29&quot; &quot;2021-04-30&quot;
-## [121] &quot;2021-05-01&quot; &quot;2021-05-02&quot; &quot;2021-05-03&quot; &quot;2021-05-04&quot; &quot;2021-05-05&quot;
-## [126] &quot;2021-05-06&quot; &quot;2021-05-07&quot; &quot;2021-05-08&quot; &quot;2021-05-09&quot; &quot;2021-05-10&quot;
-## [131] &quot;2021-05-11&quot; &quot;2021-05-12&quot; &quot;2021-05-13&quot; &quot;2021-05-14&quot; &quot;2021-05-15&quot;
-## [136] &quot;2021-05-16&quot; &quot;2021-05-17&quot; &quot;2021-05-18&quot; &quot;2021-05-19&quot; &quot;2021-05-20&quot;
-## [141] &quot;2021-05-21&quot; &quot;2021-05-22&quot; &quot;2021-05-23&quot; &quot;2021-05-24&quot; &quot;2021-05-25&quot;
-## [146] &quot;2021-05-26&quot; &quot;2021-05-27&quot; &quot;2021-05-28&quot; &quot;2021-05-29&quot; &quot;2021-05-30&quot;
-## [151] &quot;2021-05-31&quot; &quot;2021-06-01&quot; &quot;2021-06-02&quot; &quot;2021-06-03&quot; &quot;2021-06-04&quot;
-## [156] &quot;2021-06-05&quot; &quot;2021-06-06&quot; &quot;2021-06-07&quot; &quot;2021-06-08&quot; &quot;2021-06-09&quot;
-## [161] &quot;2021-06-10&quot; &quot;2021-06-11&quot; &quot;2021-06-12&quot; &quot;2021-06-13&quot; &quot;2021-06-14&quot;
-## [166] &quot;2021-06-15&quot; &quot;2021-06-16&quot; &quot;2021-06-17&quot; &quot;2021-06-18&quot; &quot;2021-06-19&quot;
-## [171] &quot;2021-06-20&quot; &quot;2021-06-21&quot; &quot;2021-06-22&quot; &quot;2021-06-23&quot; &quot;2021-06-24&quot;
-## [176] &quot;2021-06-25&quot; &quot;2021-06-26&quot; &quot;2021-06-27&quot; &quot;2021-06-28&quot; &quot;2021-06-29&quot;
-## [181] &quot;2021-06-30&quot; &quot;2021-07-01&quot; &quot;2021-07-02&quot; &quot;2021-07-03&quot; &quot;2021-07-04&quot;
-## [186] &quot;2021-07-05&quot; &quot;2021-07-06&quot; &quot;2021-07-07&quot; &quot;2021-07-08&quot; &quot;2021-07-09&quot;
-## [191] &quot;2021-07-10&quot; &quot;2021-07-11&quot; &quot;2021-07-12&quot; &quot;2021-07-13&quot; &quot;2021-07-14&quot;
-## [196] &quot;2021-07-15&quot; &quot;2021-07-16&quot; &quot;2021-07-17&quot; &quot;2021-07-18&quot; &quot;2021-07-19&quot;
-## [201] &quot;2021-07-20&quot;
-## 
-## $dt
-## [1] 1</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">=</span> <span class="fu">SEIQRDP</span>(<span class="at">alpha =</span> params<span class="sc">$</span>alpha1, <span class="at">beta =</span> params<span class="sc">$</span>beta1,</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">gamma =</span> params<span class="sc">$</span>gamma1, <span class="at">delta =</span> params<span class="sc">$</span>delta1,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">lambda0 =</span> params<span class="sc">$</span>Lambda1, <span class="at">kappa0 =</span> params<span class="sc">$</span>Kappa1,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>              Npop, E0, I0, Q0, R0, D0, <span class="at">lambdaFun =</span> params<span class="sc">$</span>lambdaFun,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">kappaFun =</span> params<span class="sc">$</span>kappaFun, <span class="at">tstart =</span> start, <span class="at">tfinish =</span> finish,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">dt =</span> dt, <span class="at">f =</span> f)</span></code></pre></div>
+<p>Predictions for susceptible cases:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(result<span class="sc">$</span>susceptible)</span></code></pre></div>
+<pre><code>## [1] 63525764 62367410 61232275 60119483 59028246 57957856</code></pre>
+<p>Predictions for exposed cases:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(result<span class="sc">$</span>exposed)</span></code></pre></div>
+<pre><code>## [1] 172430.1 208581.2 240909.2 269984.9 296289.1 320227.1</code></pre>
+<p>Predictions for infectious cases:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(result<span class="sc">$</span>infectious)</span></code></pre></div>
+<pre><code>## [1] 172430.1 163463.5 156138.9 150228.3 145536.5 141895.8</code></pre>
+<p>Predictions for quarantined cases:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(result<span class="sc">$</span>quarantined)</span></code></pre></div>
+<pre><code>## [1] 574767.0 569659.1 564016.1 557984.0 551686.3 545227.3</code></pre>
+<p>Predictions for recovered cases:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(result<span class="sc">$</span>recovered)</span></code></pre></div>
+<pre><code>## [1] 1479988 1498423 1516708 1534826 1552767 1570524</code></pre>
+<p>Predictions for dead cases:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(result<span class="sc">$</span>dead)</span></code></pre></div>
+<pre><code>## [1] 74621.00 75557.08 76488.47 77414.14 78333.29 79245.28</code></pre>
+<p>Predictions for insusceptible cases:</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(result<span class="sc">$</span>insusceptible)</span></code></pre></div>
+<pre><code>## [1]       0 1116906 2213464 3290080 4347141 5385025</code></pre>
 <p>Create plot for reported and predicted active, recovered and death cases. This function also plots the fitted and calculated death and recovered ratios to check whether the approximation of these ratios is appropriate:</p>
-<pre class="r"><code>title =   title = paste0(country, &quot; (Reported time range: &quot;, start, &quot;-&quot;, finish, &quot;). Future predictions: &quot;,f, &quot; days.&quot;)
-
-plotSEIQRDP(result, Active, recovered, deaths, title, params, checkRates = TRUE)</code></pre>
-<p><img src="index_files/figure-html/plot-1.png" width="672" /><img src="index_files/figure-html/plot-2.png" width="672" /><img src="index_files/figure-html/plot-3.png" width="672" /></p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>title <span class="ot">=</span>   title <span class="ot">=</span> <span class="fu">paste0</span>(country, <span class="st">&quot; (Reported time range: &quot;</span>, start, <span class="st">&quot;-&quot;</span>, finish, <span class="st">&quot;). Future predictions: &quot;</span>,f, <span class="st">&quot; days.&quot;</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plotSEIQRDP</span>(result, Active, recovered, deaths, title, params, <span class="at">checkRates =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="index_files/figure-html/plot-1.png" /><!-- --><img src="index_files/figure-html/plot-2.png" /><!-- --><img src="index_files/figure-html/plot-3.png" /><!-- --></p>
 </div>
+</section>
 
 
-
-
-</div>
-
-<script>
-
-// add bootstrap table styles to pandoc tables
-function bootstrapStylePandocTables() {
-  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
-}
-$(document).ready(function () {
-  bootstrapStylePandocTables();
-});
-
-
-</script>
-
-<!-- tabsets -->
-
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
 
 <!-- code folding -->
 
